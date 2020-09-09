@@ -259,6 +259,17 @@ def main():
         shutil.move(pth, opt.checkpoint)
         log.info(f'json_stats: {json.dumps(lmsg)}')
 
+    # added by suili for embedding output
+    with open(f'{opt.checkpoint}.names', 'w') as f:
+      for object in objects:
+        f.write("%s\n" % object)
+    chkpnt = th.load(opt.checkpoint, map_location='cpu')
+    model = build_model(opt, chkpnt['embeddings'].size(0))
+    model.load_state_dict(chkpnt['model'])
+    weight = model.lt.weight.detach().numpy()
+    with open(f'{opt.checkpoint}.txt','w') as f:
+    for line in weight:
+    np.savetxt(f, line)
 
 if __name__ == '__main__':
     main()
